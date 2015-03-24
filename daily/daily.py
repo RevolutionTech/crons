@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 The Daily Roundup
 Gathers information across the web that I am interested in and

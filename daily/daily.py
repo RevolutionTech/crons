@@ -48,9 +48,17 @@ class DailyRoundup(object):
         return section_xkcd_html, section_xkcd_text
 
     @staticmethod
-    def send_email_smtp(email_from, email_to, email_subject,
-        email_content_text, email_content_html, smtp_server_address,
-        smtp_server_port, email_login, email_password):
+    def send_email_smtp(
+        email_from,
+        email_to,
+        email_subject,
+        email_content_text,
+        email_content_html,
+        smtp_server_address,
+        smtp_server_port,
+        email_login,
+        email_password
+    ):
         email_msg = MIMEMultipart('alternative')
         email_msg['Subject'] = email_subject
         email_msg['From'] = email_from
@@ -67,7 +75,8 @@ class DailyRoundup(object):
 
     @classmethod
     def send_email(cls, email_to=None):
-        sys.stdout.write("Sending email... "); sys.stdout.flush()
+        sys.stdout.write("Sending email... ")
+        sys.stdout.flush()
         section_begin_html = (
             "<!DOCTYPE html>"
             "<html lang=\"en\">"
@@ -96,9 +105,10 @@ class DailyRoundup(object):
             email_login=cls.email_login,
             email_password=cls.email_password
         )
-        sys.stdout.write("Sent successfully!\n"); sys.stdout.flush()
+        sys.stdout.write("Sent successfully!\n")
+        sys.stdout.flush()
 
 
 if __name__ == "__main__":
-    if datetime.datetime.today().weekday() in (0, 2, 4): # Mon/Wed/Fri
+    if datetime.datetime.today().weekday() in (0, 2, 4):  # Mon / Wed / Fri
         DailyRoundup.send_email()

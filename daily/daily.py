@@ -29,16 +29,34 @@ class DailyRoundup(object):
     SMTP_SERVER_ADDRESS = 'smtp.gmail.com'
     SMTP_SERVER_PORT = 587
 
-    @staticmethod
-    def latest_xkcd():
-        xkcd_api_url = "http://xkcd.com/info.0.json"
-        xkcd_api_response = requests.get(xkcd_api_url).json()
-        section_xkcd_html = (
-            "<h3>Today\'s xkcd: {xkcd_title}</h3>"
-            "<img src=\"{xkcd_img}\">"
-            "<br/><br/>{xkcd_img_alt}"
-            "<br/><br/><hr>"
-        ).format(
+    XKCD_API_URL = 'http://xkcd.com/info.0.json'
+
+    HTML_SECTION_BEGIN = """
+    <!DOCTYPE html>
+    <html lang=\"en\">
+      <head>
+        <meta charset=\"utf-8\">
+        <title>Daily Roundup</title>
+      </head>
+      <body>
+        <div align=\"center\"><h1>Daily Roundup for {weekday}</h1>
+    """
+    HTML_SECTION_END = """
+        </div>
+      </body>
+    </html>
+    """
+    HTML_SECTION_XKCD = """
+    <h3>Today\'s xkcd: {xkcd_title}</h3>
+    <img src=\"{xkcd_img}\" />
+    <br /><br />{xkcd_img_alt}
+    <br /><br /><hr />
+    """
+
+    @classmethod
+    def latest_xkcd(cls):
+        xkcd_api_response = requests.get(cls.XKCD_API_URL).json()
+        section_xkcd_html = cls.HTML_SECTION_XKCD.format(
             xkcd_title=xkcd_api_response['title'],
             xkcd_img=xkcd_api_response['img'],
             xkcd_img_alt=xkcd_api_response['alt'],
@@ -66,28 +84,19 @@ class DailyRoundup(object):
     def send_email(cls):
         sys.stdout.write("Sending email... ")
         sys.stdout.flush()
-        section_begin_html = (
-            "<!DOCTYPE html>"
-            "<html lang=\"en\">"
-            "<head>"
-            "   <meta charset=\"utf-8\">"
-            "   <title>Daily Roundup</title>"
-            "</head>"
-            "<body>"
-            "<div align=\"center\"><h1>Daily Roundup for {weekday}</h1>"
-        ).format(weekday=datetime.datetime.today().strftime("%A"))
-        section_end_html = (
-            "</div>"
-            "</body>"
-            "</html>"
-        )
-        section_xkcd_html, section_xkcd_text = cls.latest_xkcd()
 
+        section_xkcd_html, section_xkcd_text = cls.latest_xkcd()
+        email_content_html = (
+            cls.HTML_SECTION_BEGIN.format(weekday=datetime.datetime.today().strftime("%A"))
+            + section_xkcd_html
+            + cls.HTML_SECTION_END
+        )
         cls.send_email_smtp(
             email_subject="Daily Roundup",
             email_content_text=section_xkcd_text,
-            email_content_html=(section_begin_html + section_xkcd_html + section_end_html)
+            email_content_html=email_content_html
         )
+
         sys.stdout.write("Sent successfully!\n")
         sys.stdout.flush()
 

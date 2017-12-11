@@ -52,6 +52,7 @@ class DailyRoundup(object):
     <br /><br />{xkcd_img_alt}
     <br /><br /><hr />
     """
+    TEXT_SECTION_XKCD = "Visit xkcd.com to view today\'s xkcd\n"
 
     @classmethod
     def latest_xkcd(cls):
@@ -61,8 +62,7 @@ class DailyRoundup(object):
             xkcd_img=xkcd_api_response['img'],
             xkcd_img_alt=xkcd_api_response['alt'],
         )
-        section_xkcd_text = "Visit xkcd.com to view today\'s xkcd\n"
-        return section_xkcd_html, section_xkcd_text
+        return section_xkcd_html, cls.TEXT_SECTION_XKCD
 
     @classmethod
     def send_email_smtp(cls, email_subject, email_content_text, email_content_html):

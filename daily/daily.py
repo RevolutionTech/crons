@@ -13,20 +13,19 @@ sends me an email with that information.
 import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
 from smtplib import SMTP
 import sys
 
 import requests
 
-import secret
-
 
 class DailyRoundup(object):
 
-    email_from = secret.EMAIL_FROM
-    email_to = secret.EMAIL_TO
-    email_login = secret.EMAIL_LOGIN
-    email_password = secret.EMAIL_PASSWORD
+    email_from = os.environ['EMAIL_FROM']
+    email_to = os.environ['EMAIL_TO']
+    email_login = os.environ['EMAIL_LOGIN']
+    email_password = os.environ['EMAIL_PASSWORD']
     smtp_server_address = 'smtp.gmail.com'
     smtp_server_port = 587
 

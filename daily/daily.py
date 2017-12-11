@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 The Daily Roundup
 Gathers information across the web that I am interested in and
@@ -98,6 +96,6 @@ class DailyRoundup(object):
         sys.stdout.flush()
 
 
-if __name__ == "__main__":
+def lambda_handler(event, context):
     if datetime.datetime.today().weekday() in (0, 2, 4):  # Mon / Wed / Fri
         DailyRoundup.send_email()

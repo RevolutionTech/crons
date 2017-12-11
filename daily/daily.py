@@ -22,12 +22,13 @@ import requests
 
 class DailyRoundup(object):
 
+    SMTP_SERVER_ADDRESS = 'smtp.gmail.com'
+    SMTP_SERVER_PORT = 587
     EMAIL_FROM = os.environ['EMAIL_FROM']
     EMAIL_TO = os.environ['EMAIL_TO']
     EMAIL_LOGIN = os.environ['EMAIL_LOGIN']
     EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
-    SMTP_SERVER_ADDRESS = 'smtp.gmail.com'
-    SMTP_SERVER_PORT = 587
+    EMAIL_SUBJECT = "Daily Roundup"
 
     XKCD_API_URL = 'http://xkcd.com/info.0.json'
 
@@ -65,13 +66,13 @@ class DailyRoundup(object):
         return section_xkcd_html, cls.TEXT_SECTION_XKCD
 
     @classmethod
-    def send_email_smtp(cls, email_subject, email_content_text, email_content_html):
+    def send_email_smtp(cls, content_text, content_html):
         email_msg = MIMEMultipart('alternative')
-        email_msg['Subject'] = email_subject
+        email_msg['Subject'] = cls.EMAIL_SUBJECT
         email_msg['From'] = cls.EMAIL_FROM
         email_msg['To'] = cls.EMAIL_TO
-        email_msg.attach(MIMEText(email_content_text, 'plain'))
-        email_msg.attach(MIMEText(email_content_html, 'html'))
+        email_msg.attach(MIMEText(content_text, 'plain'))
+        email_msg.attach(MIMEText(content_html, 'html'))
         server = SMTP(cls.SMTP_SERVER_ADDRESS, cls.SMTP_SERVER_PORT)
         server.ehlo()
         server.starttls()
@@ -86,16 +87,12 @@ class DailyRoundup(object):
         sys.stdout.flush()
 
         section_xkcd_html, section_xkcd_text = cls.latest_xkcd()
-        email_content_html = (
+        content_html = (
             cls.HTML_SECTION_BEGIN.format(weekday=datetime.datetime.today().strftime("%A"))
             + section_xkcd_html
             + cls.HTML_SECTION_END
         )
-        cls.send_email_smtp(
-            email_subject="Daily Roundup",
-            email_content_text=section_xkcd_text,
-            email_content_html=email_content_html
-        )
+        cls.send_email_smtp(content_text=section_xkcd_text, content_html=content_html)
 
         sys.stdout.write("Sent successfully!\n")
         sys.stdout.flush()

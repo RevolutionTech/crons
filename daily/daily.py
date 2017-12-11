@@ -22,12 +22,12 @@ import requests
 
 class DailyRoundup(object):
 
-    email_from = os.environ['EMAIL_FROM']
-    email_to = os.environ['EMAIL_TO']
-    email_login = os.environ['EMAIL_LOGIN']
-    email_password = os.environ['EMAIL_PASSWORD']
-    smtp_server_address = 'smtp.gmail.com'
-    smtp_server_port = 587
+    EMAIL_FROM = os.environ['EMAIL_FROM']
+    EMAIL_TO = os.environ['EMAIL_TO']
+    EMAIL_LOGIN = os.environ['EMAIL_LOGIN']
+    EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
+    SMTP_SERVER_ADDRESS = 'smtp.gmail.com'
+    SMTP_SERVER_PORT = 587
 
     @staticmethod
     def latest_xkcd():
@@ -50,16 +50,16 @@ class DailyRoundup(object):
     def send_email_smtp(cls, email_subject, email_content_text, email_content_html):
         email_msg = MIMEMultipart('alternative')
         email_msg['Subject'] = email_subject
-        email_msg['From'] = cls.email_from
-        email_msg['To'] = cls.email_to
+        email_msg['From'] = cls.EMAIL_FROM
+        email_msg['To'] = cls.EMAIL_TO
         email_msg.attach(MIMEText(email_content_text, 'plain'))
         email_msg.attach(MIMEText(email_content_html, 'html'))
-        server = SMTP(cls.smtp_server_address, cls.smtp_server_port)
+        server = SMTP(cls.SMTP_SERVER_ADDRESS, cls.SMTP_SERVER_PORT)
         server.ehlo()
         server.starttls()
         server.ehlo()
-        server.login(cls.email_login, cls.email_password)
-        server.sendmail(cls.email_from, cls.email_to, email_msg.as_string())
+        server.login(cls.EMAIL_LOGIN, cls.EMAIL_PASSWORD)
+        server.sendmail(cls.EMAIL_FROM, cls.EMAIL_TO, email_msg.as_string())
         server.close()
 
     @classmethod

@@ -47,34 +47,24 @@ class DailyRoundup(object):
         section_xkcd_text = "Visit xkcd.com to view today\'s xkcd\n"
         return section_xkcd_html, section_xkcd_text
 
-    @staticmethod
-    def send_email_smtp(
-        email_from,
-        email_to,
-        email_subject,
-        email_content_text,
-        email_content_html,
-        smtp_server_address,
-        smtp_server_port,
-        email_login,
-        email_password
-    ):
+    @classmethod
+    def send_email_smtp(cls, email_subject, email_content_text, email_content_html):
         email_msg = MIMEMultipart('alternative')
         email_msg['Subject'] = email_subject
-        email_msg['From'] = email_from
-        email_msg['To'] = email_to
+        email_msg['From'] = cls.email_from
+        email_msg['To'] = cls.email_to
         email_msg.attach(MIMEText(email_content_text, 'plain'))
         email_msg.attach(MIMEText(email_content_html, 'html'))
-        server = SMTP(smtp_server_address, smtp_server_port)
+        server = SMTP(cls.smtp_server_address, cls.smtp_server_port)
         server.ehlo()
         server.starttls()
         server.ehlo()
-        server.login(email_login, email_password)
-        server.sendmail(email_from, email_to, email_msg.as_string())
+        server.login(cls.email_login, cls.email_password)
+        server.sendmail(cls.email_from, cls.email_to, email_msg.as_string())
         server.close()
 
     @classmethod
-    def send_email(cls, email_to=None):
+    def send_email(cls):
         sys.stdout.write("Sending email... ")
         sys.stdout.flush()
         section_begin_html = (
@@ -95,15 +85,9 @@ class DailyRoundup(object):
         section_xkcd_html, section_xkcd_text = cls.latest_xkcd()
 
         cls.send_email_smtp(
-            email_from=cls.email_from,
-            email_to=email_to or cls.email_to,
             email_subject="Daily Roundup",
             email_content_text=section_xkcd_text,
-            email_content_html=(section_begin_html + section_xkcd_html + section_end_html),
-            smtp_server_address=cls.smtp_server_address,
-            smtp_server_port=cls.smtp_server_port,
-            email_login=cls.email_login,
-            email_password=cls.email_password
+            email_content_html=(section_begin_html + section_xkcd_html + section_end_html)
         )
         sys.stdout.write("Sent successfully!\n")
         sys.stdout.flush()

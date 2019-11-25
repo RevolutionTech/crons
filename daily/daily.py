@@ -12,7 +12,7 @@ import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
-from smtplib import SMTP
+from smtplib import SMTP_SSL
 import sys
 
 import requests
@@ -21,7 +21,6 @@ import requests
 class DailyRoundup(object):
 
     SMTP_SERVER_ADDRESS = 'smtp.gmail.com'
-    SMTP_SERVER_PORT = 587
     EMAIL_FROM = os.environ['EMAIL_FROM']
     EMAIL_TO = os.environ['EMAIL_TO']
     EMAIL_LOGIN = os.environ['EMAIL_LOGIN']
@@ -71,9 +70,7 @@ class DailyRoundup(object):
         email_msg['To'] = cls.EMAIL_TO
         email_msg.attach(MIMEText(content_text, 'plain'))
         email_msg.attach(MIMEText(content_html, 'html'))
-        server = SMTP(cls.SMTP_SERVER_ADDRESS, cls.SMTP_SERVER_PORT)
-        server.ehlo()
-        server.starttls()
+        server = SMTP_SSL(cls.SMTP_SERVER_ADDRESS)
         server.ehlo()
         server.login(cls.EMAIL_LOGIN, cls.EMAIL_PASSWORD)
         server.sendmail(cls.EMAIL_FROM, cls.EMAIL_TO, email_msg.as_string())
